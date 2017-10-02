@@ -1,24 +1,52 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-
+import YTSearch from 'youtube-api-search';
 import SearchBar from './components/search_bar';
-
+import VideoList from './components/video_list';
+import VideoDetail from './components/video_detail';
 const API_KEY = 'AIzaSyATQwkMI-DSD1ROaxCPampE8tvPSILsu1k';
 
-// Create new component. This component should produce some HTML
-const App = () => {
-	return (
-		<div>
-			<SearchBar />
-		</div>
-	);
-}
+class App extends Component {
+	constructor(props) {
+		super(props);
 
-// Take this component's generated HTML and put it on the page (in the DOM)
+		this.state = { 
+			videos: [],
+			selectedVideo: null
+		};
+
+
+		// var that = this;
+		// YTSearch({key: API_KEY, term: 'surfboards'}, function(videos) { //Why doesn't work?
+		YTSearch({key: API_KEY, term: 'surfboards'}, (videos) => {
+			this.setState({ 
+				videos: videos,
+				selectedVideo: videos[0]
+			});
+		});
+	}
+
+	render() {
+		return (
+			<div>
+				<SearchBar />
+				<VideoDetail video={this.state.selectedVideo} />
+				<VideoList 
+					onVideoSelect={selectedVideo => this.setState({selectedVideo})}
+					videos={this.state.videos}/>
+			</div>
+		);
+	}
+}
 
 ReactDOM.render(<App />, document.querySelector('.container')); // Why do we do it like this?
 
-/* And not like this? 15! out of 149
+/* And not like this?
 var myApp = new App();
 ReactDOM.render(myApp, document.querySelector('.container'));
+
+
+<VideoList 
+	onVideoSelect={selectedVideo => this.setState({selectedVideo})}
+	videos={this.state.videos}/>
 */
