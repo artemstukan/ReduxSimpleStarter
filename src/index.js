@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import YTSearch from 'youtube-api-search';
@@ -15,10 +16,11 @@ class App extends Component {
 			selectedVideo: null
 		};
 
+		this.videoSearch('bear surfing');
+	}
 
-		// var that = this;
-		// YTSearch({key: API_KEY, term: 'surfboards'}, function(videos) { //Why doesn't work?
-		YTSearch({key: API_KEY, term: 'surfboards'}, (videos) => {
+	videoSearch(term) {
+		YTSearch({key: API_KEY, term: term}, (videos) => {
 			this.setState({ 
 				videos: videos,
 				selectedVideo: videos[0]
@@ -27,9 +29,11 @@ class App extends Component {
 	}
 
 	render() {
+		const videoSearch = _.debounce((term) => { this.videoSearch(term) }, 300);
+
 		return (
 			<div>
-				<SearchBar />
+				<SearchBar onSearchTermChange={videoSearch} />
 				<VideoDetail video={this.state.selectedVideo} />
 				<VideoList 
 					onVideoSelect={selectedVideo => this.setState({selectedVideo})}
@@ -39,14 +43,4 @@ class App extends Component {
 	}
 }
 
-ReactDOM.render(<App />, document.querySelector('.container')); // Why do we do it like this?
-
-/* And not like this?
-var myApp = new App();
-ReactDOM.render(myApp, document.querySelector('.container'));
-
-
-<VideoList 
-	onVideoSelect={selectedVideo => this.setState({selectedVideo})}
-	videos={this.state.videos}/>
-*/
+ReactDOM.render(<App />, document.querySelector('.container'));
